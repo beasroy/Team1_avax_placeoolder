@@ -1,5 +1,72 @@
-import AriseByTeam1 from "@/components/AriseByTeam1";
+"use client"
+
+
+import { AriseLandingFlow } from "@/components/AriseLanding";
+import { DashboardPage } from "@/components/Pages/dashboard";
+import { ProfilePage } from "@/components/Pages/profile-page";
+import { Navigation } from "@/components/Navigation";
+import { Loader } from "@/components/Loader";
+import { useSession, signOut } from "next-auth/react";
+import { useState, useEffect } from "react";
+
+type PageType = "intro" | "auth" | "dashboard" | "contribution" | "exp-bounty" | "leaderboard" | "profile"
 
 export default function Home() {
-  return <AriseByTeam1 />;
+  const { data: session, status } = useSession()
+  const [currentPage, setCurrentPage] = useState<PageType>("intro")
+
+  // Auto-redirect to dashboard when user logs in
+  useEffect(() => {
+    if (session && currentPage === "intro") {
+      setCurrentPage("dashboard")
+    }
+  }, [session, currentPage])
+
+  // Show loading while session is being fetched
+  if (status === "loading") {
+    return (
+      // <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      //   <div className="text-center">
+      //     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
+      //     <p className="text-red-400/70">Loading...</p>
+      //   </div>
+      // </div>
+      <div className = "min-h-screen bg-black flex items-center justify-center">
+        <Loader />
+      </div>
+      
+    )
+  }
+
+  const handleNavigate = (page: Exclude<PageType, "intro" | "auth">) => {
+    setCurrentPage(page)
+  }
+
+  const handleLogout = async () => {
+    await signOut({ redirect: false })
+    setCurrentPage("intro") 
+  }
+
+  return (
+    <>
+      {session && (
+        <Navigation
+          currentPage={(currentPage as unknown) as any}
+          onNavigate={handleNavigate as any}
+          onLogout={handleLogout}
+        />
+      )}
+      {session ? (
+        currentPage === "dashboard" ? (
+          <DashboardPage isLoggedIn={!!session} />
+        ) : currentPage === "profile" ? (
+          <ProfilePage />
+        ) : (
+          <div>Other pages coming soon...</div>
+        )
+      ) : (
+        <AriseLandingFlow />
+      )}
+    </>
+  )
 }

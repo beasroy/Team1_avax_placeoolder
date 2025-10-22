@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Orbitron, Space_Grotesk } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
+import { QueryProvider } from "@/components/providers/QueryProvider";
 import "./globals.css";
 
 const orbitron = Orbitron({
@@ -31,7 +32,9 @@ export default function RootLayout({
         className={`${orbitron.variable} ${spaceGrotesk.variable} antialiased`}
       >
         <SessionProvider>
-          {children}
+          <QueryProvider>
+            {children}
+          </QueryProvider>
         </SessionProvider>
       </body>
     </html>

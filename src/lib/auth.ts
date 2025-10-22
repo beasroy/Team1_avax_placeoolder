@@ -1,6 +1,7 @@
 import NextAuth from 'next-auth';
 import  NeonAdapter  from "@auth/neon-adapter";
 import Twitter from "next-auth/providers/twitter";
+import Google from "next-auth/providers/google";
 import { Pool } from '@neondatabase/serverless';
 import { db } from '@/app/db';
 import { eq } from 'drizzle-orm';
@@ -17,6 +18,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       clientId: process.env.TWITTER_CLIENT_ID!,
       clientSecret: process.env.TWITTER_CLIENT_SECRET!,
     }),
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
@@ -30,11 +35,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             profile_image_url: string;
           };
 
+          // Get current user to update connectedPlatforms array
+          const currentUser = await db.select().from(users).where(eq(users.id, user.id)).limit(1);
+          const currentPlatforms = currentUser[0]?.connectedPlatforms || [];
+          const updatedPlatforms = currentPlatforms.includes('twitter') 
+            ? currentPlatforms 
+            : [...currentPlatforms, 'twitter'];
+
           // Update user with Twitter username and ID
           await db.update(users)
             .set({
               username: twitterData.username, // Twitter handle like "0xSarnavo"
               twitterId: twitterData.id,
+              connectedPlatforms: updatedPlatforms,
               updatedAt: new Date(),
             })
             .where(eq(users.id, user.id));
@@ -45,6 +58,35 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           });
         } catch (error) {
           console.error("❌ Error updating user:", error);
+        }
+        } else if (account?.provider === "google" && profile) {
+        try {
+          // Extract Google data - only need email
+          const googleData = profile as {
+            email: string;
+          };
+
+          // Get current user to update connectedPlatforms array
+          const currentUser = await db.select().from(users).where(eq(users.id, user.id)).limit(1);
+          const currentPlatforms = currentUser[0]?.connectedPlatforms || [];
+          const updatedPlatforms = currentPlatforms.includes('google') 
+            ? currentPlatforms 
+            : [...currentPlatforms, 'google'];
+
+          // Update user with only email and connected platforms
+          await db.update(users)
+            .set({
+              email: googleData.email,
+              connectedPlatforms: updatedPlatforms,
+              updatedAt: new Date(),
+            })
+            .where(eq(users.id, user.id));
+
+          console.log("✅ Updated user with Google data:", {
+            email: googleData.email,
+          });
+        } catch (error) {
+          console.error("❌ Error updating user with Google:", error);
         }
       }
       return true;

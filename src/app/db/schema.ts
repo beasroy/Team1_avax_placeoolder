@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, integer, uuid, bigint, unique, index } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, integer, uuid, bigint, unique, index, json } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -7,7 +7,9 @@ export const users = pgTable("users", {
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   image: text("image"),
   username: text("username"),
+  bio: text("bio"),
   twitterId: text("twitter_id").unique(),
+  connectedPlatforms: json("connected_platforms").$type<string[]>().default([]),
   level: integer("level").default(1),
   exp: integer("exp").default(0),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
