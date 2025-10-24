@@ -1,6 +1,5 @@
 "use client"
 
-
 import { AriseLandingFlow } from "@/components/AriseLanding";
 import { DashboardPage } from "@/components/Pages/dashboard";
 import { ProfilePage } from "@/components/Pages/profile-page";
@@ -15,22 +14,16 @@ export default function Home() {
   const { data: session, status } = useSession()
   const [currentPage, setCurrentPage] = useState<PageType>("intro")
 
-  // Auto-redirect to dashboard when user logs in
   useEffect(() => {
     if (session && currentPage === "intro") {
       setCurrentPage("dashboard")
     }
   }, [session, currentPage])
 
-  // Show loading while session is being fetched
+
   if (status === "loading") {
     return (
-      // <div className="min-h-screen bg-black text-white flex items-center justify-center">
-      //   <div className="text-center">
-      //     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
-      //     <p className="text-red-400/70">Loading...</p>
-      //   </div>
-      // </div>
+   
       <div className = "min-h-screen bg-black flex items-center justify-center">
         <Loader />
       </div>

@@ -34,6 +34,7 @@ export function Navigation({ currentPage, onNavigate, onLogout }: FloatingNaviga
             {navItems.map((item) => {
               const Icon = item.icon
               const isActive = currentPage === item.id
+              const disableItems = item.id !== "dashboard"
               return (
                 <button
                   key={item.id}
@@ -41,8 +42,9 @@ export function Navigation({ currentPage, onNavigate, onLogout }: FloatingNaviga
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-sm font-medium ${
                     isActive
                       ? "bg-red-600 text-white shadow-lg shadow-red-500/50"
-                      : "text-white/70 hover:text-white hover:bg-red-500/20"
-                  }`}
+                      : "text-white/70 hover:text-white hover:bg-red-500/20 "
+                  }
+                   ${disableItems ? "cursor-not-allowed opacity-50 hover:bg-transparent hover:text-white/70" : ""}`}
                   title={item.label}
                 >
                   <Icon className="w-4 h-4" />
