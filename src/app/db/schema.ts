@@ -4,11 +4,9 @@ export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name"),
   email: text("email").unique(),
-  emailVerified: timestamp("emailVerified", { mode: "date" }),
   image: text("image"),
   username: text("username"),
   bio: text("bio"),
-  twitterId: text("twitter_id").unique(),
   connectedPlatforms: json("connected_platforms").$type<string[]>().default([]),
   level: integer("level").default(1),
   exp: integer("exp").default(0),
@@ -32,7 +30,6 @@ export const accounts = pgTable("accounts", {
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow(),
 }, (account) => ({
-  // Change from primaryKey to unique constraint
   providerProviderAccountIdKey: unique().on(account.provider, account.providerAccountId),
   userIdIdx: index("idx_accounts_userId").on(account.userId),
 }));
@@ -48,10 +45,3 @@ export const sessions = pgTable("sessions", {
   sessionTokenIdx: index("idx_sessions_sessionToken").on(session.sessionToken),
 }));
 
-export const verificationTokens = pgTable("verification_token", {
-  identifier: text("identifier").notNull(),
-  token: text("token").notNull(),
-  expires: timestamp("expires", { mode: "date" }).notNull(),
-}, (vt) => ({
-  compoundKey: unique().on(vt.identifier, vt.token),
-}));

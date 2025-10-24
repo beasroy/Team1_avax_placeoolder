@@ -35,7 +35,7 @@ export function useProfile() {
     queryFn: fetchProfile,
     enabled: !!session, // Only fetch if user is logged in
     staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   })

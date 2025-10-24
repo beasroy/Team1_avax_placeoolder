@@ -3,12 +3,11 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Mail, Twitter, Wallet, Shield, Bell, Lock, AlertCircle } from "lucide-react"
-import { useSession, signIn } from "next-auth/react"
+import { Mail, X, Wallet, Shield, Bell, Lock, AlertCircle } from "lucide-react"
+import { signIn } from "next-auth/react"
 import { useProfile } from "@/hooks/useProfile"
 
 export function ProfilePage() {
-  const { data: session } = useSession()
   const { profile, isLoading, updateProfile, isUpdating } = useProfile()
   const [showEmailWarning, setShowEmailWarning] = useState(false)
   const [formData, setFormData] = useState({
@@ -17,7 +16,6 @@ export function ProfilePage() {
     email: ""
   })
 
-  // Update form data when profile loads
   useEffect(() => {
     if (profile) {
       setFormData({
@@ -46,7 +44,6 @@ export function ProfilePage() {
       }
       return
     }
-    // Email notifications logic can be added here if needed in the future
   }
 
   const connectedAccounts = [
@@ -59,7 +56,7 @@ export function ProfilePage() {
     { 
       platform: "X (Twitter)", 
       connected: profile?.connectedPlatforms?.includes('twitter') || false, 
-      icon: Twitter 
+      icon: X 
     },
     { 
       platform: "Wallet", 
@@ -133,7 +130,7 @@ export function ProfilePage() {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-2 border border-border rounded-lg bg-muted text-muted-foreground cursor-not-allowed"
+                className="w-full px-4 py-2 border border-border rounded-lg  text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
 
